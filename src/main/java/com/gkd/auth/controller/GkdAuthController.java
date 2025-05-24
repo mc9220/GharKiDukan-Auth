@@ -1,5 +1,6 @@
 package com.gkd.auth.controller;
 
+import com.gkd.auth.model.AuthResponse;
 import com.gkd.auth.model.User;
 import com.gkd.auth.service.JwtService;
 import com.gkd.auth.service.UserService;
@@ -23,17 +24,17 @@ public class GkdAuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public String register(@RequestBody AuthRequest request) {
+    public AuthResponse register(@RequestBody AuthRequest request) {
         User user = userService.saveUser(request.getUsername(), request.getPassword(), "ROLE_USER");
-        return jwtService.generateToken(user.getUsername());
+        return  AuthResponse.builder().accessToken(jwtService.generateToken(user.getUsername())).build();
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody AuthRequest request) {
+    public AuthResponse login(@RequestBody AuthRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        return jwtService.generateToken(request.getUsername());
+        return AuthResponse.builder().accessToken(jwtService.generateToken(request.username)).build();
     }
 
     @Getter
@@ -42,4 +43,6 @@ public class GkdAuthController {
         private String username;
         private String password;
     }
+
+
 }
